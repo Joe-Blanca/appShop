@@ -4120,6 +4120,9 @@ input[type="button"].btn-block {
 }
 
 @media (max-width: 767.98px) {
+  .text-sm{
+    font-size: 10px;
+  }
   .navbar-expand-md > .container,
   .navbar-expand-md > .container-fluid, .navbar-expand-md > .container-sm, .navbar-expand-md > .container-md, .navbar-expand-md > .container-lg, .navbar-expand-md > .container-xl {
     padding-right: 0;
@@ -8095,6 +8098,11 @@ button.bg-dark:focus {
 }
 
 @media (min-width: 768px) {
+
+  .text-sm{
+    font-size: 5px;
+  }
+
   .m-md-0 {
     margin: 0 !important;
   }

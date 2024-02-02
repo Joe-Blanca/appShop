@@ -12,23 +12,18 @@
             <div class="col-lg-6 text-center text-lg-right">
                 <div class="d-inline-flex align-items-center">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown"><i class="fa-solid fa-user"></i> Usuário</button>
+                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown"><i class="fa-solid fa-user"></i> <?php if(isset($_SESSION['id_pessoa'])){echo $_SESSION['nome'];};;?></button>
                         <div class="dropdown-menu dropdown-menu-right">
                             <button class="dropdown-item" type="button"><i class="fa-solid fa-gear"></i> Conta</button>
                             <hr class="hr"></hr>
-                            <button class="dropdown-item" type="button"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                            <button type="button" class="btn btn-primary w-100" data-toggle="modal" data-target="#popupLogin"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                            <form method="POST">
+                                <div id="btnHolder">
+                                    <button type="submit" name="sair" class="btn btn-danger text-white w-100">Sair</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </div>
-                <div class="d-inline-flex align-items-center d-block d-lg-none">
-                    <a href="" class="btn px-0 ml-2">
-                        <i class="fas fa-heart text-dark"></i>
-                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">3</span>
-                    </a>
-                    <a href="" class="btn px-0 ml-2">
-                        <i class="fas fa-shopping-cart text-dark"></i>
-                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">4</span>
-                    </a>
                 </div>
             </div>
         </div>

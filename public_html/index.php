@@ -1,3 +1,53 @@
+<?php
+if (!isset($_SESSION)) {
+    session_start();
+}
+
+if (isset($_POST['sair'])) {
+    unset($_SESSION['id_pessoa']);
+    unset($_SESSION['email']);
+    session_destroy();
+    header('Location: /shop/appShop/public_html/index.php');
+}
+
+
+require_once dirname(__DIR__) . '/include/model/user/Logar.php';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (isset($_POST['email']) && isset($_POST['senha'])) {
+        $login = new Logar();
+
+        $email = $_POST['email'];
+        $senha = $_POST['senha'];
+
+        $usuario = $login->autenticar($email, $senha);
+
+        if ($usuario) {
+            session_start();
+            
+            $_SESSION['id_pessoa'] = $usuario['id_pessoa'];
+            $_SESSION['email'] = $usuario['email'];
+            $_SESSION['nome'] = $usuario['nome'];
+
+            if (isset($_POST['lembrar']) && $_POST['lembrar'] == 'on') {
+                setcookie('lembrar_email', $email, time() + 3600 * 24 * 30); 
+                setcookie('lembrar_senha', $senha, time() + 3600 * 24 * 30);
+            } else {
+                setcookie('lembrar_email', '', time() - 3600);
+                setcookie('lembrar_senha', '', time() - 3600);
+            }
+
+            header("Location: /shop/appShop/public_html/index.php");
+            exit();
+        } else {
+            echo '<script>alert("Usuário ou Senha incorretos...");</script>';
+        }
+    } else {
+        echo "Email e senha não foram fornecidos.";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +59,7 @@
     <meta content="Free HTML Templates" name="description">
 
     <!-- Favicon -->
-    <link href="view/img/favicon.ico" rel="icon">
+    <!-- <link href="view/img/favicon.ico" rel="icon"> -->
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -24,14 +74,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Libraries Stylesheet -->
-    <link href="lib/animate/animate.min.css" rel="stylesheet">
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="view/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="view/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="view/css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    <?php include('view/components/topNav.php'); ?>
+    <?php include('view/components/navbar.html'); ?>
+
     <!-- Carousel Start -->
     <div class="container-fluid mb-3">
         <div class="row px-xl-5">
@@ -42,94 +95,47 @@
                         <li data-target="#header-carousel" data-slide-to="1"></li>
                         <li data-target="#header-carousel" data-slide-to="2"></li>
                     </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item position-relative active" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="view/img/carousel-1.jpg" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Moda Masculina</h1>
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Comprar Agora</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="view/img/carousel-2.jpg" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Moda Feminina</h1>
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Comprar Agora</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="view/img/carousel-3.jpg" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <div class="p-3" style="max-width: 700px;">
-                                    <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Moda Infantil</h1>
-                                    <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                                    <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="#">Comprar Agora</a>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="carousel-inner" id="slideHome">
+                        
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="view/img/offer-1.jpg" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Desconto 20%</h6>
-                        <h3 class="text-white mb-3">Oferta Especial</h3>
-                        <a href="" class="btn btn-primary">Comprar Agora</a>
-                    </div>
-                </div>
-                <div class="product-offer mb-30" style="height: 200px;">
-                    <img class="img-fluid" src="view/img/offer-2.jpg" alt="">
-                    <div class="offer-text">
-                        <h6 class="text-white text-uppercase">Desconto 20%</h6>
-                        <h3 class="text-white mb-3">Oferta Especial</h3>
-                        <a href="" class="btn btn-primary">Comprar Agora</a>
-                    </div>
-                </div>
+            <div class="col-lg-4" id="cardPromo">
             </div>
         </div>
     </div>
     <!-- Carousel End -->
 
-
     <!-- Featured Start -->
-    <div class="container-fluid pt-5">
-        <div class="row px-xl-5 pb-3">
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+    <div class="container-fluid">
+        <div class="row px-xl-5 pb-3" >
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6 pb-1">
+                <div class="d-flex align-items-center bg-light mb-4 border-rounded" style="padding: 10px;">
                     <h1 class="fa fa-check text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">Produtos de Qualidade</h5>
+                    <h5 class="font-weight-semi-bold text-sm" id="cardHome1">Produtos de Qualidade</h5>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-6 pb-1">
+                <div class="d-flex align-items-center bg-light mb-4 rounded" style="padding: 10px;">
                     <h1 class="fa fa-shipping-fast text-primary m-0 mr-2"></h1>
-                    <h5 class="font-weight-semi-bold m-0">Entregas Grátis</h5>
+                    <h5 class="font-weight-semi-bold m-0 text-sm" id="cardHome2">Entregas Grátis</h5>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-6 pb-1">
+                <div class="d-flex align-items-center bg-light mb-4" style="padding: 10px;">
                     <h1 class="fa-solid fa-shield-halved text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">Pedido Seguro</h5>
+                    <h5 class="font-weight-semi-bold m-0 text-sm" id="cardHome3">Pedido Seguro</h5>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
-                <div class="d-flex align-items-center bg-light mb-4" style="padding: 30px;">
+            <div class="col-lg-3 col-md-6 col-sm-12 col-6 pb-1">
+                <div class="d-flex align-items-center bg-light mb-4" style="padding: 10px;">
                     <h1 class="fa fa-phone-volume text-primary m-0 mr-3"></h1>
-                    <h5 class="font-weight-semi-bold m-0">7 dias por Semana</h5>
+                    <h5 class="font-weight-semi-bold m-0 text-sm" id="cardHome4">7 dias por Semana</h5>
                 </div>
             </div>
         </div>
     </div>
     <!-- Featured End -->
-
 
     <!-- Categories Start -->
     <div class="container-fluid pt-5">
@@ -449,11 +455,14 @@
     </div>
     <!-- Products End -->
 
+    <?php include('view/components/footer.html'); ?>
+    <?php include('view/components/modal/login.php'); ?>
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
     <script src="view/lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="view/lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Contact Javascript File -->
     <script src="controller/mail/jqBootstrapValidation.min.js"></script>
@@ -461,6 +470,10 @@
 
     <!-- Template Javascript -->
     <script src="view/js/main.js"></script>
+
+    <!-- imports and others -->
+    <script src="/shop/appShop/include/controller/shared/obtSlide.js"></script>
+    <script src="/shop/appShop/include/controller/shared/obtCardPromo.js"></script>
 </body>
 
 </html>
